@@ -1,0 +1,53 @@
+# This .gitignore file is based on Unity's recommended settings
+
+# OS-specific files
+.DS_Store
+Thumbs.db
+
+# Visual Studio / JetBrains Rider generated files
+*.csproj
+*.unityproj
+*.sln
+*.user
+*.userprefs
+*.pidb
+*.booproj
+*.svd
+*.pdb
+*.mdb
+*.opendb
+*.ide
+
+# Unity generated folders
+Library/
+Temp/
+Obj/
+Build/
+Builds/
+Logs/
+UserSettings/
+MemoryCaptures/
+
+# Asset Store files
+*.unitypackage
+
+# Generated Lightmaps
+LightmapSnapshot
+
+# Built data
+*.apk
+*.aab
+*.exe
+*.app
+*.ipk
+*.xap
+*.xcarchive
+*.ipa
+
+# Other
+*.swp
+*.tmp
+*.unitypackage
+
+# Crashlytics
+Crashlytics/
