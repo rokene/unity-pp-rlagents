@@ -56,7 +56,7 @@ Training your agent.
 
 ```bash
 cd mla
-mlagents-learn ./trainer_config.yaml --run-id hummingbird01
+mlagents-learn ./trainer_config.yaml --run-id hummingbirdMulti01
 ```
 
 > You can start this while training to view results in real-time.

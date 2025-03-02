@@ -53,6 +53,9 @@ public class HummingbirdAgent : Agent
     // Whether the agent is frozen (intentionally not flying)
     private bool frozen = false;
 
+    // Other hummingbirds within a 10ft (3m) radius
+    private List<HummingbirdAgent> nearbyHummingbirds = new List<HummingbirdAgent>();
+
     /// <summary>
     /// The amount of nectar the agent has obtained this episode
     /// </summary>
@@ -187,17 +190,39 @@ public class HummingbirdAgent : Agent
         sensor.AddObservation(toFlower.normalized);
 
         // Observe a dot product that indicates whether the beak tip is in front of the flower (1 observation)
-        // (+1 means that the beak tip is directly in front of the flower, -1 means directly behind)
         sensor.AddObservation(Vector3.Dot(toFlower.normalized, -nearestFlower.FlowerUpVector.normalized));
 
         // Observe a dot product that indicates whether the beak is pointing toward the flower (1 observation)
-        // (+1 means that the beak is pointing directly at the flower, -1 means directly away)
         sensor.AddObservation(Vector3.Dot(beakTip.forward.normalized, -nearestFlower.FlowerUpVector.normalized));
 
         // Observe the relative distance from the beak tip to the flower (1 observation)
         sensor.AddObservation(toFlower.magnitude / FlowerArea.AreaDiameter);
 
-        // 10 total observations
+        // Add observations for up to 3 nearby hummingbirds (each with 3 position observations)
+        nearbyHummingbirds.Clear();
+        Collider[] colliders = Physics.OverlapSphere(transform.position, 3f);
+        foreach (Collider collider in colliders)
+        {
+            if (collider.TryGetComponent(out HummingbirdAgent otherBird) && otherBird != this)
+            {
+                nearbyHummingbirds.Add(otherBird);
+                if (nearbyHummingbirds.Count >= 3)
+                    break;
+            }
+        }
+
+        for (int i = 0; i < 3; i++)
+        {
+            if (i < nearbyHummingbirds.Count)
+            {
+                Vector3 relativePos = nearbyHummingbirds[i].transform.position - transform.position;
+                sensor.AddObservation(relativePos / 3f); // Normalize by the 10ft (3m) radius
+            }
+            else
+            {
+                sensor.AddObservation(Vector3.zero); // No nearby bird
+            }
+        }
     }
 
     /// <summary>

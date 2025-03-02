@@ -630,7 +630,7 @@ GameObject:
   - component: {fileID: 781949028449994832}
   m_Layer: 0
   m_Name: Hummingbird
-  m_TagString: Untagged
+  m_TagString: hummingbird
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -763,7 +763,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_BrainParameters:
-    VectorObservationSize: 10
+    VectorObservationSize: 19
     NumStackedVectorObservations: 1
     m_ActionSpec:
       m_NumContinuousActions: 5
@@ -772,7 +772,7 @@ MonoBehaviour:
     VectorActionDescriptions: []
     VectorActionSpaceType: 1
     hasUpgradedBrainParametersWithActionSpec: 1
-  m_Model: {fileID: 5022602860645237092, guid: 6f6b47d03d0458a4cbae8afec3425ffa, type: 3}
+  m_Model: {fileID: 5022602860645237092, guid: 72dca9cbce1084c4e8625ec2f88ce24f, type: 3}
   m_InferenceDevice: 0
   m_BehaviorType: 0
   m_BehaviorName: Hummingbird
