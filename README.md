@@ -1,6 +1,6 @@
 # Hummingbird ML Agents
 
-A simple demonstration on training a hummingbird to play a hummingbird game.
+A simple demonstration on training a hummingbird to play a hummingbird game based on [Hummingbird](https://learn.unity.com/course/ml-agents-hummingbirds?uv=2019.3)
 
 ## Prerequisites
 * Python 3.10.12
