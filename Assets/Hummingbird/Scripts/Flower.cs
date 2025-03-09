@@ -97,17 +97,34 @@ public class Flower : MonoBehaviour
     /// <summary>
     /// Resets the flower
     /// </summary>
-    public void ResetFlower()
+    public void ResetFlower(bool active=true)
     {
-        // Refill the nectar
-        NectarAmount = 1f;
+        if (active)
+        {
+            // Resetting flower to active
+            // Refill the nectar
+            NectarAmount = 1f;
 
-        // Enable the flower and nectar colliders
-        flowerCollider.gameObject.SetActive(true);
-        nectarCollider.gameObject.SetActive(true);
+            // Enable the flower and nectar colliders
+            flowerCollider.gameObject.SetActive(true);
+            nectarCollider.gameObject.SetActive(true);
 
-        // Change the flower color to indicate that it is full
-        flowerMaterial.SetColor("_BaseColor", fullFlowerColor);
+            // Change the flower color to indicate that it is full
+            flowerMaterial.SetColor("_BaseColor", fullFlowerColor);
+        }
+        else
+        {
+            // Resetting flower to not active
+            // Set nectar to zero
+            NectarAmount = 0f;
+
+            // Disable the flower and nectar colliders
+            flowerCollider.gameObject.SetActive(false);
+            nectarCollider.gameObject.SetActive(false);
+
+            // Change the flower color to indicate that it is full
+            flowerMaterial.SetColor("_BaseColor", emptyFlowerColor);
+        }
     }
 
     /// <summary>

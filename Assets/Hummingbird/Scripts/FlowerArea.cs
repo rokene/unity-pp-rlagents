@@ -36,10 +36,15 @@ public class FlowerArea : MonoBehaviour
             flowerPlant.transform.localRotation = Quaternion.Euler(xRotation, yRotation, zRotation);
         }
 
-        // Reset each flower
+        // determine % of flowers available in game area 50 to 100 percent
+        float randomPercentAvail = UnityEngine.Random.Range(0.5f, 1f);
+        Debug.Log("Flowers availability probability set to " + randomPercentAvail);
+
+        // Reset each flower based on probability available
         foreach (Flower flower in Flowers)
         {
-            flower.ResetFlower();
+            if (UnityEngine.Random.value <= randomPercentAvail) flower.ResetFlower(true);
+            else flower.ResetFlower(false);
         }
     }
 

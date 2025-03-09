@@ -56,6 +56,15 @@ public class HummingbirdAgent : Agent
     // Other hummingbirds within a 10ft (3m) radius
     private List<HummingbirdAgent> nearbyHummingbirds = new List<HummingbirdAgent>();
 
+    [Tooltip("Is this the primary player/agent that will spawn competitors?")]
+    public bool isPrimaryAgent = false;
+
+    [Tooltip("Competitor hummingbird prefab to spawn during training")]
+    public HummingbirdAgent competitorPrefab;
+
+    // Keep track of any spawned competitors so we can clean up later
+    private List<HummingbirdAgent> spawnedCompetitors = new List<HummingbirdAgent>();
+
     /// <summary>
     /// The amount of nectar the agent has obtained this episode
     /// </summary>
@@ -73,17 +82,8 @@ public class HummingbirdAgent : Agent
         if (!trainingMode) MaxStep = 0;
     }
 
-    /// <summary>
-    /// Reset the agent when an episode begins
-    /// </summary>
-    public override void OnEpisodeBegin()
+    public void ResetBird()
     {
-        if (trainingMode)
-        {
-            // Only reset flowers in training when there is one agent per area
-            flowerArea.ResetFlowers();
-        }
-
         // Reset nectar obtained
         NectarObtained = 0f;
 
@@ -104,6 +104,70 @@ public class HummingbirdAgent : Agent
 
         // Recalculate the nearest flower now that the agent has moved
         UpdateNearestFlower();
+        if (isPrimaryAgent) Debug.Log("Primary Hummingbird initialized.");
+        else Debug.Log("Competitor Hummingbird initialized.");
+    }
+
+    /// <summary>
+    /// Reset the agent when an episode begins
+    /// </summary>
+    public override void OnEpisodeBegin()
+    {
+        Debug.Log("Episode begins.");
+
+        if (trainingMode && isPrimaryAgent)
+        {
+            // Only the primary agent spawns or cleans up competitors
+            // NOTE: somehow spawning competitors this way causes unity to freeze
+            bool spawnCompetitors = false;
+
+            // Reset flowers
+            flowerArea.ResetFlowers();
+
+            if (spawnCompetitors)
+            {
+
+                Debug.Log("Destroying old competitors.");
+
+                // Destroy leftover competitors from the previous episode
+                foreach (var competitor in spawnedCompetitors)
+                {
+                    if (competitor != null)
+                    {
+                        Destroy(competitor.gameObject);
+                    }
+                }
+
+                Debug.Log("Clearing competitors.");
+
+                spawnedCompetitors.Clear();
+
+                Debug.Log("Creating competitors.");
+
+                // Decide how many new competitors to spawn (0–5)
+                int competitorCount = UnityEngine.Random.Range(0, 6);
+
+                Debug.Log("Spawning competitors " + competitorCount);
+
+                for (int i = 0; i < competitorCount; i++)
+                {
+                    // Instantiate a competitor from the prefab
+                    HummingbirdAgent newCompetitor = Instantiate(competitorPrefab, flowerArea.transform);
+
+                    // Mark them as training mode but *not* the primary
+                    newCompetitor.trainingMode = true;
+                    newCompetitor.isPrimaryAgent = false;
+                    newCompetitor.flowerArea = this.flowerArea;
+
+                    // Manually reset them so they’re placed/initialized correctly
+                    newCompetitor.ResetBird();
+
+                    // Add to our tracking list
+                    spawnedCompetitors.Add(newCompetitor);
+                }
+            }
+        }
+        ResetBird();
     }
 
     /// <summary>
@@ -176,7 +240,7 @@ public class HummingbirdAgent : Agent
         // If nearestFlower is null, observe an empty array and return early
         if (nearestFlower == null)
         {
-            sensor.AddObservation(new float[10]);
+            sensor.AddObservation(new float[19]);
             return;
         }
 
@@ -357,6 +421,7 @@ public class HummingbirdAgent : Agent
             safePositionFound = colliders.Length == 0;
         }
 
+        Debug.Log("Looked for safe positions remaining attempts: " + attemptsRemaining);
         Debug.Assert(safePositionFound, "Could not find a safe position to spawn");
 
         // Set the position and rotation
@@ -481,5 +546,36 @@ public class HummingbirdAgent : Agent
         // Avoids scenario where nearest flower nectar is stolen by opponent and not updated
         if (nearestFlower != null && !nearestFlower.HasNectar)
             UpdateNearestFlower();
+    }
+
+    private void AwardWinnerAndReset()
+    {
+        // Check this agent plus all spawned competitors
+        List<HummingbirdAgent> allBirds = new List<HummingbirdAgent>(spawnedCompetitors);
+        allBirds.Add(this); // include the primary agent
+
+        // Find the winner
+        HummingbirdAgent winner = null;
+        float maxNectar = float.MinValue;
+
+        foreach (HummingbirdAgent bird in allBirds)
+        {
+            if (bird.NectarObtained > maxNectar)
+            {
+                maxNectar = bird.NectarObtained;
+                winner = bird;
+            }
+        }
+
+        if (winner != null)
+        {
+            winner.AddReward(1.0f); // Or your chosen bonus
+        }
+
+        // EndEpisode on all
+        foreach (HummingbirdAgent bird in allBirds)
+        {
+            bird.EndEpisode();
+        }
     }
 }

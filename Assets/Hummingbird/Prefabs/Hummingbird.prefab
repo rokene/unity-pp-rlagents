@@ -772,7 +772,7 @@ MonoBehaviour:
     VectorActionDescriptions: []
     VectorActionSpaceType: 1
     hasUpgradedBrainParametersWithActionSpec: 1
-  m_Model: {fileID: 5022602860645237092, guid: 72dca9cbce1084c4e8625ec2f88ce24f, type: 3}
+  m_Model: {fileID: 0}
   m_InferenceDevice: 0
   m_BehaviorType: 0
   m_BehaviorName: Hummingbird
@@ -803,6 +803,8 @@ MonoBehaviour:
   beakTip: {fileID: 749827769155012578}
   agentCamera: {fileID: 697276075942232764}
   trainingMode: 1
+  isPrimaryAgent: 0
+  competitorPrefab: {fileID: 2775023322949735886}
 --- !u!114 &781949028449994832
 MonoBehaviour:
   m_ObjectHideFlags: 0
